@@ -56,8 +56,8 @@ def handle_response(data):
 
         elif content[:2] == u'cop':
             reply_text = cop()
-            if len(content) > 3:
-                reply_text = cop(content[4:])
+            # if len(content) > 3:
+            #     reply_text = cop(content[4:])
 
         else:
             reply_text = content
