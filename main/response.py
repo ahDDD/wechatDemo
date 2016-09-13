@@ -7,6 +7,7 @@ from flask import make_response
 from wechat_sdk.exceptions import ParseError
 from wechat_sdk.messages import TextMessage, EventMessage
 from .tools.convert_dt import *
+from .tools.cop import *
 from sqlalchemy.exc import IntegrityError, InvalidRequestError
 
 def handle_response(data):
@@ -51,15 +52,22 @@ def handle_response(data):
         message_instance.save()
 
         if content == u'我':
-            return me(wechat, user)
+            reply_text = me(user)
+
+        elif content[:2] == u'cop':
+            reply_text = cop()
+            if len(content) > 3:
+                reply_text = cop(content[4:])
+
         else:
             reply_text = content
-            reply = wechat.response_text(content=reply_text)
-            response = make_response(reply)
-            response.content_type = 'application/xml'
-            return response
 
-def me(wechat, user):
+        reply = wechat.response_text(content=reply_text)
+        response = make_response(reply)
+        response.content_type = 'application/xml'
+        return response
+
+def me(user):
     content = \
         '''
 目前还没法知道你叫什么\n
@@ -74,7 +82,4 @@ def me(wechat, user):
     last_message_content = str(last_message.message_content.encode('utf-8'))
     last_message_dt = last_message.dt.strftime('%Y-%m-%d %H:%M:%S')
     reply_text = content % (subscribe_dt, messages_count, last_message_content, last_message_dt)
-    reply = wechat.response_text(content=reply_text)
-    response = make_response(reply)
-    response.content_type = 'application/xml'
-    return response
+    return reply_text
