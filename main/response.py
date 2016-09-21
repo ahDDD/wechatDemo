@@ -8,6 +8,7 @@ from wechat_sdk.exceptions import ParseError
 from wechat_sdk.messages import TextMessage, EventMessage
 from .tools.convert_dt import *
 from .tools.cop import *
+from .tools.eat_what import *
 from sqlalchemy.exc import IntegrityError, InvalidRequestError
 
 def handle_response(data):
@@ -58,6 +59,14 @@ def handle_response(data):
             reply_text = cop()
             # if len(content) > 3:
             #     reply_text = cop(content[4:])
+
+        elif content[:4] == u'我知道 ':
+            add_food(content[4:])
+            reply_text = u'好'
+
+        elif content[:5] == u'今天吃什么':
+
+            reply_text = lookup_food()
 
         else:
             reply_text = content
