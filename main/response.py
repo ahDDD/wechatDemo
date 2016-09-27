@@ -9,7 +9,10 @@ from wechat_sdk.messages import TextMessage, EventMessage
 from .tools.convert_dt import *
 from .tools.cop import *
 from .tools.eat_what import *
+from .tools.requests_test import check_720p
 from sqlalchemy.exc import IntegrityError, InvalidRequestError
+
+import re
 
 def handle_response(data):
     wechat = init_wechat_instance()
@@ -64,9 +67,11 @@ def handle_response(data):
             add_food(content[4:])
             reply_text = u'好'
 
-        elif content[:5] == u'今天吃什么':
-
+        elif re.search(u'今天吃什么', content):
             reply_text = lookup_food()
+
+        elif re.search(u'你的名字', content):
+            reply_text = check_720p()
 
         else:
             reply_text = content
